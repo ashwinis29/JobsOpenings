@@ -61,7 +61,7 @@ namespace JobsOpenings.Repositories
 
                 var paginatedQuery = pageRequest.PageSize * (pageRequest.PageNo - 1);
                 //Fetch all matching records from 3 tables based on ID
-                List<JobsModel.Data> jobList = (from j in _dataContext.tblJobs
+                IQueryable<JobsModel.Data> jobList = (from j in _dataContext.tblJobs
                                                 join l in _dataContext.Location on j.locationId equals l.Id
                                                 join d in _dataContext.Department on j.departmentId equals d.Id
                                                 select new JobsModel.Data
@@ -74,26 +74,22 @@ namespace JobsOpenings.Repositories
                                                     PostedDate = j.postedDate,
                                                     ClosingDate = j.closingDate
                                                 }
-                                   ).OrderBy(m => m.Id).ToList();
+                                   );
                 //if incase both are present then return location id data as 1st priority
                 if (pageRequest.LocationId != 0)
                 {
                     // Filter by location ID if provided
-                    response.data = jobList.Where(job => job.Id == pageRequest.LocationId).
-                                              OrderBy(m => m.Id).Skip(paginatedQuery).Take(pageRequest.PageSize).ToList();
+                    jobList = jobList.Where(job => job.Id == pageRequest.LocationId);
                 }
                 else if (pageRequest.DepartmentId != 0)
                 {
                     // Filter by department ID if provided
-                    response.data = jobList.Where(job => job.Id == pageRequest.DepartmentId).
-                                              OrderBy(m => m.Id).Skip(paginatedQuery).Take(pageRequest.PageSize).ToList();
+                    jobList = jobList.Where(job => job.Id == pageRequest.DepartmentId);
                 }
-                else
-                {
                     //Return data as per pagination
-                    response.data = jobList.Skip(paginatedQuery).Take(pageRequest.PageSize).ToList();
-                }
-                response.Total = response.data.Count;
+                response.data = jobList.OrderBy(m => m.Id).Skip(paginatedQuery).Take(pageRequest.PageSize).ToList();
+ 
+                response.Total = jobList.Count();
             }
             catch(Exception ex) { }
             return response;

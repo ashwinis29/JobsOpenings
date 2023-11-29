@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using System.Reflection.Metadata;
 using static JobsOpenings.Models.JobsModel;
 
@@ -42,7 +43,7 @@ namespace JobsOpenings.Controllers
                 {
                     // Manually construct the location URL
                     var locationUri = $"{Request?.Scheme}://{Request?.Host.ToUriComponent()}/api/v1/jobs/{job.Id}";
-                    return Created(locationUri, 201);
+                    return Created(locationUri, HttpStatusCode.Created);
                 }
                 else
                 {
