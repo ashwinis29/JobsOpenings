@@ -26,7 +26,7 @@ namespace JobsOpenings.Repositories
             {
                 if(job != null)
                 {
-                    var j = _dataContext.tblJobs.Add(job);
+                    _dataContext.tblJobs.Add(job);
                     _dataContext.SaveChanges();
                     success = true;
                 }
